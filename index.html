@@ -1,0 +1,1189 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>都道府県×産業：規模（GDP）×稼ぐ力（GDPシェア−雇用シェア）＋売上</title>
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --line: #334155;
+      --btn: #3b82f6;
+      --btn-hover: #2563eb;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-jp: 'Noto Sans JP', var(--font-main);
+    }
+
+    body {
+      margin: 0;
+      font-family: var(--font-jp);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      padding: 20px 24px;
+      background: rgba(30, 41, 59, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    main {
+      display: block;
+      padding: 24px;
+      max-width: 1800px;
+      margin: 0 auto;
+    }
+
+    @media (max-width: 1000px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 16px 0;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+    }
+
+    input,
+    select,
+    button {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: #0f172a;
+      color: var(--text);
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--btn);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+
+    button {
+      cursor: pointer;
+      background: var(--btn);
+      border: none;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    button:hover {
+      background: var(--btn-hover);
+    }
+
+    button.secondary {
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--muted);
+    }
+
+    button.secondary:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+
+    .small {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 12px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .chart {
+      height: 400px;
+    }
+
+    .chartTall {
+      height: 600px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--line);
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      background: var(--card);
+      z-index: 10;
+      border-bottom: 2px solid var(--line);
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .log {
+      white-space: pre-wrap;
+      font-family: 'SF Mono', Consolas, Menlo, monospace;
+      font-size: 12px;
+      color: var(--muted);
+      background: #0f172a;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      max-height: 200px;
+      overflow: auto;
+    }
+
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 24px 0;
+    }
+
+    .chk {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .chk input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      cursor: pointer;
+      accent-color: var(--btn);
+    }
+
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:16px;">
+      <div>
+        <h1>都道府県×産業：規模（純付加価値）と稼ぐ力（GDPシェア−雇用シェア）＋売上（民営）</h1>
+        <div class="sub">
+          指標ごとに最新年（例：GDP/売上=2020、雇用=2021など）を自動で採用します。
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center;">
+        <label style="color:var(--muted);font-weight:600;">都道府県</label>
+        <select id="prefSelect" style="min-width:200px;"></select>
+        <button class="secondary" id="dlBtn">CSVダウンロード</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- LEFT -->
+    <!-- Hidden inputs for logic compatibility -->
+    <div style="display:none">
+      <div id="log" class="log"></div>
+    </div>
+
+    <!-- RIGHT -->
+    <section class="card">
+      <div class="grid2">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:13px;font-weight:700;">産業別 GDPシェア</div>
+              <div class="small">純付加価値額（民営）を産業内訳で配分</div>
+            </div>
+            <span class="pill" id="gdpPill"></span>
+          </div>
+          <div id="gdpBar" class="chart"></div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:13px;font-weight:700;">産業別 雇用シェア</div>
+              <div class="small">従業者数（民営）を産業内訳で配分</div>
+            </div>
+            <span class="pill" id="empPill"></span>
+          </div>
+          <div id="empBar" class="chart"></div>
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top:14px;">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:13px;font-weight:700;">産業別 売上シェア</div>
+              <div class="small">売上金額（民営）を産業内訳で配分</div>
+            </div>
+            <span class="pill" id="salesPill"></span>
+          </div>
+          <div id="salesBar" class="chart"></div>
+        </div>
+
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-size:13px;font-weight:700;">付加価値率（GDP÷売上）</div>
+              <div class="small">“稼ぎ方の質”：高いほど粗利的に高付加価値</div>
+            </div>
+            <span class="pill" id="vaRatePill"></span>
+          </div>
+          <div id="vaRateBar" class="chart"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div style="font-size:13px;font-weight:700;">稼ぐ力マップ（産業別）</div>
+            <div class="small" id="scatterCaption">
+              横：雇用シェア / 縦：GDPシェア（45度線より上＝高付加価値型）
+            </div>
+          </div>
+          <span class="pill" id="scatterPill"></span>
+        </div>
+        <div id="scatter" class="chartTall"></div>
+        <div class="small" style="margin-top:6px;">
+          ※ 点のサイズは売上シェアを反映（売上が大きい産業が目立つ）
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;">稼ぐ力ランキング（GDPシェア − 雇用シェア）</div>
+        <div style="max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:12px;">
+          <table id="rankTable">
+            <thead>
+              <tr>
+                <th style="width:44px;cursor:pointer" onclick="sortRows('rank')">順位</th>
+                <th style="cursor:pointer" onclick="sortRows('industry')">産業</th>
+                <th style="width:120px;cursor:pointer" onclick="sortRows('diff')">稼ぐ力差（pt）</th>
+                <th style="width:105px;cursor:pointer" onclick="sortRows('gdp_share')">GDPシェア（％）</th>
+                <th style="width:105px;cursor:pointer" onclick="sortRows('emp_share')">雇用シェア（％）</th>
+                <th style="width:105px;cursor:pointer" onclick="sortRows('sales_share')">売上シェア（％）</th>
+                <th style="width:120px;cursor:pointer" onclick="sortRows('va_rate')">付加価値率（％）</th>
+                <th style="width:140px;cursor:pointer" onclick="sortRows('labor_productivity')">労働生産性<br>（百万円/人）</th>
+              </tr>
+            </thead>
+            <tbody id="rankBody"></tbody>
+          </table>
+        </div>
+        <div class="small" style="margin-top:8px;">
+          稼ぐ力差 = GDPシェア − 雇用シェア（pt表示）。付加価値率=GDP÷売上。労働生産性=GDP÷従業者（民営）。
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:14px;">
+        <div style="font-size:13px;font-weight:700;margin-bottom:6px;">地域別の特色（全国平均との比較）</div>
+        <div style="max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:12px;">
+          <table id="compTable">
+            <thead>
+              <tr>
+                <th style="cursor:pointer" onclick="sortComp('industry')">産業</th>
+                <th style="width:140px;cursor:pointer" onclick="sortComp('lq')">特化係数（LQ）</th>
+                <th style="width:180px;cursor:pointer" onclick="sortComp('prod_gap')">労働生産性格差<br>（百万円/人）</th>
+                <th style="width:140px;cursor:pointer" onclick="sortComp('share_gap')">シェア差（pt）</th>
+                <th style="width:160px;cursor:pointer" onclick="sortComp('nat_prod')">【参考】全国生産性<br>（百万円/人）</th>
+              </tr>
+            </thead>
+            <tbody id="compBody"></tbody>
+          </table>
+        </div>
+        <div class="small" style="margin-top:8px;">
+          特化係数(LQ) = 県GDPシェア ÷ 全国GDPシェア（1.0以上は集積あり）。<br>
+          労働生産性格差 = 県生産性 − 全国生産性（プラスなら全国平均より生産性が高い）。<br>
+          シェア差 = 県GDPシェア − 全国GDPシェア（プラスなら全国平均より集積している）。
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // =========================
+    // Fixed indicator mappings (leaf industries only)
+    // =========================
+    const INDUSTRIES = [
+      { name: "農業、林業", gdp: "0701050301000110011", emp: "0701020301000110011", sales: "0701040201000110011" },
+      { name: "漁業", gdp: "0701050301000110020", emp: "0701020301000110020", sales: "0701040201000110020" },
+      { name: "鉱業、採石業、砂利採取業", gdp: "0701050301000210030", emp: "0701020301000210030", sales: "0701040201000210030" },
+      { name: "建設業", gdp: "0701050301000210040", emp: "0701020301000210040", sales: "0701040201000210040" },
+      { name: "製造業", gdp: "0701050301000210050", emp: "0701020301000210050", sales: "0701040201000210050" },
+      { name: "電気・ガス・熱供給・水道業", gdp: "0701050301000210060", emp: "0701020301000210060", sales: "0701040201000210060" },
+      { name: "情報通信業", gdp: "0701050301000210070", emp: "0701020301000210070", sales: "0701040201000210070" },
+      { name: "運輸業、郵便業", gdp: "0701050301000210080", emp: "0701020301000210080", sales: "0701040201000210080" },
+      { name: "卸売業", gdp: "0701050301000210091", emp: "0701020301000210091", sales: "0701040201000210091" },
+      { name: "小売業", gdp: "0701050301000210092", emp: "0701020301000210092", sales: "0701040201000210092" },
+      { name: "金融業、保険業", gdp: "0701050301000210100", emp: "0701020301000210100", sales: "0701040201000210100" },
+      { name: "不動産業、物品賃貸業", gdp: "0701050301000210110", emp: "0701020301000210110", sales: "0701040201000210110" },
+      { name: "学術研究、専門・技術サービス業", gdp: "0701050301000210120", emp: "0701020301000210120", sales: "0701040201000210120" },
+      { name: "宿泊業、飲食サービス業", gdp: "0701050301000210130", emp: "0701020301000210130", sales: "0701040201000210130" },
+      { name: "生活関連サービス業、娯楽業", gdp: "0701050301000210140", emp: "0701020301000210140", sales: "0701040201000210140" },
+      { name: "教育、学習支援業", gdp: "0701050301000210150", emp: "0701020301000210150", sales: "0701040201000210150" },
+      { name: "医療、福祉", gdp: "0701050301000210160", emp: "0701020301000210160", sales: "0701040201000210160" },
+      { name: "複合サービス事業", gdp: "0701050301000210170", emp: "0701020301000210170", sales: "0701040201000210170" },
+      { name: "サービス業（他に分類されないもの）", gdp: "0701050301000210180", emp: "0701020301000210180", sales: "0701040201000210180" },
+    ];
+
+    // =========================
+    // API helpers
+    // =========================
+    const BASE = "https://dashboard.e-stat.go.jp/api/1.0";
+    const fmtFloat = new Intl.NumberFormat("ja-JP", { maximumFractionDigits: 2 });
+
+    function log(msg) {
+      const el = document.getElementById("log");
+      el.textContent += (el.textContent ? "\n" : "") + msg;
+      el.scrollTop = el.scrollHeight;
+    }
+
+    function timeCode(year, type) { return `${year}${type}00`; } // 2021FY00
+
+    const _cache = new Map();
+    async function fetchJson(url) {
+      if (_cache.has(url)) return _cache.get(url);
+      const p = (async () => {
+        const res = await fetch(url, { mode: "cors" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${url}`);
+        return await res.json();
+      })();
+      _cache.set(url, p);
+      return p;
+    }
+
+    function apiMsg(json) {
+      return json?.extension?.result?.errorMsg
+        ?? json?.GET_META_REGION_INF?.RESULT?.errorMsg
+        ?? "-";
+    }
+
+    async function loadPrefectures() {
+      const url = `${BASE}/Json/getRegionInfo?Lang=JP&RegionLevel=3`;
+      const json = await fetchJson(url);
+
+      const classObj = json?.GET_META_REGION_INF?.METADATA_INF?.CLASS_INF?.CLASS_OBJ;
+      const objs = Array.isArray(classObj) ? classObj : (classObj ? [classObj] : []);
+      const prefs = [];
+
+      for (const obj of objs) {
+        const classes = obj?.CLASS ?? [];
+        const arr = Array.isArray(classes) ? classes : (classes ? [classes] : []);
+        for (const c of arr) {
+          const code = c?.["@regionCode"] ?? c?.regionCode ?? c?.RegionCode ?? null;
+          const name = c?.["@name"] ?? c?.name ?? c?.Name ?? null;
+          if (code && name) prefs.push({ code: String(code), name: String(name) });
+        }
+      }
+
+      if (prefs.length < 40) {
+        throw new Error("都道府県一覧を取得できませんでした（RegionInfoの仕様差/ネットワークの可能性）");
+      }
+
+      prefs.sort((a, b) => a.code.localeCompare(b.code));
+      return prefs;
+    }
+
+    // =========================
+    // JsonStat: collection/link.item[] 対応（堅牢版）
+    // - link.item[i].extension に dataset 本体があるケース（あなたの実例）
+    // - link.item[i] 直下に dataset があるケース
+    // を両方拾う
+    // =========================
+    function pickDatasetFromItem(it) {
+      // 1) あなたの実例：dataset本体は item.extension
+      if (it?.extension?.dimension && (it?.extension?.value !== undefined)) return it.extension;
+      // 2) たまに dataset 本体が item 直下
+      if (it?.dimension && (it?.value !== undefined)) return it;
+      // 3) どちらでもない（メタっぽい）→ null
+      return null;
+    }
+
+    function parseJsonStatCollection(json, requestedCodes19) {
+      const out = new Map(requestedCodes19.map(c => [c, null]));
+      let timeUsed = null;
+
+      const items = json?.link?.item;
+      const itemCount = Array.isArray(items) ? items.length : 0;
+      if (!Array.isArray(items) || items.length === 0) {
+        return { map: out, timeUsed, itemCount, hasLinkItem: false };
+      }
+
+      for (const it of items) {
+        const ds = pickDatasetFromItem(it);
+        if (!ds) continue;
+
+        const dim = ds?.dimension;
+        const indDim = dim?.Indicator ?? dim?.indicator;
+        const idxObj = indDim?.category?.index;
+        const fullKey = idxObj ? Object.keys(idxObj)[0] : null;
+        if (!fullKey) continue;
+
+        // indexキーは "指標コード(19桁)+その他" なので先頭19桁で突合
+        const code19 = String(fullKey).slice(0, 19);
+        if (!out.has(code19)) continue;
+
+        const raw = Array.isArray(ds.value) ? ds.value[0] : ds.value;
+        const num = (raw === null || raw === undefined || raw === "") ? null : Number(raw);
+        out.set(code19, Number.isFinite(num) ? num : null);
+
+        if (!timeUsed) {
+          const timeDim = dim?.Time ?? dim?.time;
+          const tIdx = timeDim?.category?.index;
+          const tKey = tIdx ? Object.keys(tIdx)[0] : null;
+          if (tKey) timeUsed = tKey;
+        }
+      }
+
+      return { map: out, timeUsed, itemCount, hasLinkItem: true };
+    }
+
+    function chunk(arr, n) {
+      const out = [];
+      for (let i = 0; i < arr.length; i += n) out.push(arr.slice(i, i + n));
+      return out;
+    }
+
+    async function fetchValuesBatch({ indicatorCodes, regionCode, time, label, showRefUrl = false }) {
+      const p = new URLSearchParams();
+      p.set("Lang", "JP");
+      p.set("IndicatorCode", indicatorCodes.join(","));
+      p.set("RegionCode", regionCode);
+      p.set("Time", time);
+
+      const url = `${BASE}/JsonStat/getData?${p.toString()}`;
+      if (showRefUrl) log(`（参考URL ${label} 先頭${indicatorCodes.length}件） ${url}`);
+
+      const json = await fetchJson(url);
+      const msg = apiMsg(json);
+      if (label) log(`API（${label}）: ${msg}`);
+
+      if (json?.class === "collection") {
+        const parsed = parseJsonStatCollection(json, indicatorCodes);
+        return { ...parsed, url };
+      }
+
+      // 万一 dataset 直返しに変わった場合の保険（基本はcollection想定）
+      const out = new Map(indicatorCodes.map(c => [c, null]));
+      return { map: out, timeUsed: null, itemCount: 0, hasLinkItem: false, url };
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function plotEmpty(divId, message) {
+      Plotly.newPlot(divId, [], {
+        annotations: [{
+          text: message,
+          x: 0.5, y: 0.5, xref: "paper", yref: "paper",
+          showarrow: false,
+          font: { size: 14, color: "#94a3b8" }
+        }],
+        margin: { l: 40, r: 10, t: 10, b: 40 },
+        paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+        font: { color: "#f8fafc", family: "'Noto Sans JP', sans-serif" }
+      }, { displayModeBar: false });
+    }
+
+    // =========================
+    // Dashboard logic
+    // =========================
+    let lastRows = [];
+    let lastCompRows = [];
+    let nationalData = null; // cache for national data
+
+    async function fetchNationalData() {
+      if (nationalData) return nationalData;
+      const natCode = "00000";
+      // Fixed year for national data reference (simplification) or use same logic
+      const year = 2021;
+      const ytype = "FY";
+      const tSpecified = timeCode(year, ytype);
+      const timeCandidates = ["99999999", tSpecified];
+
+      const gdpCodes = INDUSTRIES.map(x => x.gdp);
+      const empCodes = INDUSTRIES.map(x => x.emp);
+
+      // Fetch GDP
+      let gdpMap = null;
+      for (const t of timeCandidates) {
+        const parts = chunk(gdpCodes, 5);
+        const map = new Map();
+        let ok = true;
+        for (const part of parts) {
+          const res = await fetchValuesBatch({
+            indicatorCodes: part,
+            regionCode: natCode,
+            time: t
+          });
+          if (!res.timeUsed && t !== "99999999") ok = false;
+          // Note: strict check might be too harsh, allow partial
+          for (const [k, v] of res.map.entries()) map.set(k, v);
+        }
+        // Check if we got enough data
+        const count = [...map.values()].filter(v => v !== null).length;
+        if (count > 0) {
+          gdpMap = map;
+          break;
+        }
+      }
+
+      // Fetch Emp
+      let empMap = null;
+      for (const t of timeCandidates) {
+        const parts = chunk(empCodes, 5);
+        const map = new Map();
+        for (const part of parts) {
+          const res = await fetchValuesBatch({
+            indicatorCodes: part,
+            regionCode: natCode,
+            time: t
+          });
+          for (const [k, v] of res.map.entries()) map.set(k, v);
+        }
+        const count = [...map.values()].filter(v => v !== null).length;
+        if (count > 0) {
+          empMap = map;
+          break;
+        }
+      }
+
+      if (!gdpMap || !empMap) return null;
+
+      // Process National Data
+      const rows = INDUSTRIES.map(ind => {
+        const g = gdpMap.get(ind.gdp);
+        const e = empMap.get(ind.emp);
+        return {
+          industry: ind.name,
+          gdp: g,
+          emp: e,
+        };
+      }).filter(r => r.gdp !== null && r.emp !== null);
+
+      const gdpSum = rows.reduce((a, b) => a + (b.gdp || 0), 0);
+      const empSum = rows.reduce((a, b) => a + (b.emp || 0), 0);
+
+      rows.forEach(r => {
+        r.gdpShare = r.gdp / gdpSum;
+        r.laborProductivity = (r.gdp !== null && r.emp > 0) ? (r.gdp / r.emp) : null;
+      });
+
+      nationalData = rows;
+      return nationalData;
+    }
+
+    async function runDashboard() {
+      document.getElementById("log").textContent = "";
+
+      const prefCode = document.getElementById("prefSelect").value;
+      const prefName = document.getElementById("prefSelect").selectedOptions[0]?.textContent ?? "";
+      /*
+      const year = Number(document.getElementById("yearInput").value);
+      const ytype = document.getElementById("yearType").value;
+      const axisMode = document.getElementById("axisMode").value;
+      const latestMode = document.getElementById("latestMode").checked;
+      */
+      const year = 2021;
+      const ytype = "FY";
+      const axisMode = "emp_x_gdp_y";
+      const latestMode = true;
+
+      const tSpecified = timeCode(year, ytype);
+
+      log(`取得開始：${prefName}（${prefCode}）`);
+      log(`産業数：${INDUSTRIES.length}（葉系列のみ）`);
+
+      const timeCandidates = latestMode
+        ? ["99999999"]
+        : [tSpecified, timeCode(year, (ytype === "FY" ? "CY" : "FY")), "99999999"];
+
+      log(`Time候補：${timeCandidates.join(" → ")}`);
+
+
+
+      const gdpCodes = INDUSTRIES.map(x => x.gdp);
+      const empCodes = INDUSTRIES.map(x => x.emp);
+      const salesCodes = INDUSTRIES.map(x => x.sales);
+
+      async function fetchGroup(label, codes) {
+        for (const time of timeCandidates) {
+          log(`--- 試行: ${label} Time=${time} ---`);
+
+          const map = new Map();
+          let timeUsed = null;
+
+          const parts = chunk(codes, 5);
+          for (let i = 0; i < parts.length; i++) {
+            const part = parts[i];
+            const res = await fetchValuesBatch({
+              indicatorCodes: part,
+              regionCode: prefCode,
+              time,
+              label,
+              showRefUrl: (i === 0) && (time === "99999999")
+            });
+
+            // ★ここで link.item が返っているか即確認できる
+            if (i === 0) {
+              if (time === "99999999") {
+                log(`link.item件数（${label} / Time=${time} / 先頭チャンク）: ${res.itemCount}`);
+              }
+              if (!res.hasLinkItem) {
+                log(`WARN: link.item が見つかりません（${label} / Time=${time}）。API仕様差 or 取得失敗の可能性。`);
+              }
+            }
+
+            if (!timeUsed && res.timeUsed) timeUsed = res.timeUsed;
+            for (const [k, v] of res.map.entries()) map.set(k, v);
+          }
+
+          const nonNull = [...map.values()].filter(v => v !== null && v !== undefined && !Number.isNaN(v)).length;
+          log(`非null数（${label}）: ${nonNull}/${codes.length} / 使用Time=${timeUsed ?? "-"}`);
+
+          if (nonNull > 0) {
+            return { map, timeUsed: (timeUsed ?? time), ok: true };
+          }
+          log(`NG: ${label} Time=${time} では取得できませんでした`);
+        }
+
+        return { map: new Map(codes.map(c => [c, null])), timeUsed: null, ok: false };
+      }
+
+      const gdpRes = await fetchGroup("GDP", gdpCodes);
+      const empRes = await fetchGroup("雇用", empCodes);
+      const salesRes = await fetchGroup("売上", salesCodes);
+
+      log(`Time採用：GDP=${gdpRes.timeUsed ?? "-"} / 売上=${salesRes.timeUsed ?? "-"} / 雇用=${empRes.timeUsed ?? "-"}`);
+
+
+
+      const rows = INDUSTRIES.map(ind => {
+        const g = gdpRes.map.get(ind.gdp);
+        const e = empRes.map.get(ind.emp);
+        const s = salesRes.map.get(ind.sales);
+        return {
+          industry: ind.name,
+          gdp: (g === null || g === undefined) ? null : Number(g),
+          emp: (e === null || e === undefined) ? null : Number(e),
+          sales: (s === null || s === undefined) ? null : Number(s),
+        };
+      }).filter(r => r.gdp !== null && r.emp !== null);
+
+      if (rows.length === 0) {
+        log("データが取れませんでした（GDP/雇用が全てnull）。");
+        plotEmpty("gdpBar", "データなし");
+        plotEmpty("empBar", "データなし");
+        plotEmpty("salesBar", "データなし");
+        plotEmpty("vaRateBar", "データなし");
+        plotEmpty("scatter", "データなし");
+        document.querySelector("#rankTable tbody").innerHTML = "";
+        return;
+      }
+
+      const gdpSum = rows.reduce((a, b) => a + (b.gdp || 0), 0);
+      const empSum = rows.reduce((a, b) => a + (b.emp || 0), 0);
+      if (gdpSum === 0 || empSum === 0) {
+        log("合計が0です。Time候補や系列コードを見直してください。");
+        return;
+      }
+
+      const salesAvail = rows.filter(r => r.sales !== null && !Number.isNaN(r.sales));
+      const salesSum = salesAvail.reduce((a, b) => a + (b.sales || 0), 0);
+
+      rows.forEach(r => {
+        r.gdpShare = r.gdp / gdpSum;
+        r.empShare = r.emp / empSum;
+        r.diff = r.gdpShare - r.empShare;
+
+        r.salesShare = (r.sales !== null && salesSum > 0) ? (r.sales / salesSum) : null;
+        r.vaRate = (r.sales !== null && r.sales !== 0) ? (r.gdp / r.sales) : null;
+        r.vaRate = (r.sales !== null && r.sales !== 0) ? (r.gdp / r.sales) : null;
+        // Changing salesPerEmp to laborProductivity (GDP / Emp)
+        // Unit: 100 million yen / person -> convert to yen/person?
+        // GDP in source is likely in million yen units?
+        // Actually e-Stat usually returns million yen for amounts. 
+        // If GDP is million yen, and Emp is person count.
+        // GDP/Emp = Million Yen / Person.
+        // User requested "Labor Productivity".
+        r.laborProductivity = (r.gdp !== null && r.emp > 0) ? (r.gdp / r.emp) : null;
+      });
+
+      if (salesSum === 0) {
+        log("売上が取得できない（または合計0）ため、売上系の可視化は空になります。");
+      } else {
+        log(`売上が取得できた産業：${salesAvail.length}/${rows.length}`);
+      }
+
+      // GDP bar
+      const byGdp = rows.slice().sort((a, b) => b.gdpShare - a.gdpShare);
+      Plotly.newPlot("gdpBar", [{
+        type: "bar",
+        orientation: "h",
+        y: byGdp.map(r => r.industry),
+        x: byGdp.map(r => r.gdpShare),
+        customdata: byGdp.map(r => r.gdp),
+        hovertemplate: "<b>%{y}</b><br>GDPシェア=%{x:.2%}<br>GDP値=%{customdata:,}<extra></extra>",
+        textfont: { color: '#f8fafc' }
+      }], {
+        margin: { l: 140, r: 10, t: 10, b: 20 },
+        xaxis: { tickformat: ".0%" },
+        yaxis: { autorange: "reversed", automargin: true },
+        paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+        font: { color: "#f8fafc", family: "'Noto Sans JP', sans-serif" }
+      }, { displayModeBar: false });
+
+      // EMP bar
+      const byEmp = rows.slice().sort((a, b) => b.empShare - a.empShare);
+      Plotly.newPlot("empBar", [{
+        type: "bar",
+        orientation: "h",
+        y: byEmp.map(r => r.industry),
+        x: byEmp.map(r => r.empShare),
+        customdata: byEmp.map(r => r.emp),
+        hovertemplate: "<b>%{y}</b><br>雇用シェア=%{x:.2%}<br>雇用値=%{customdata:,}<extra></extra>",
+        textfont: { color: '#f8fafc' }
+      }], {
+        margin: { l: 140, r: 10, t: 10, b: 20 },
+        xaxis: { tickformat: ".0%" },
+        yaxis: { autorange: "reversed", automargin: true },
+        paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+        font: { color: "#f8fafc", family: "'Noto Sans JP', sans-serif" }
+      }, { displayModeBar: false });
+
+      // Sales & VA rate
+      const rowsWithSales = rows.filter(r => r.salesShare !== null);
+      if (rowsWithSales.length === 0) {
+        plotEmpty("salesBar", "売上データなし（Time候補を変更して試してください）");
+        plotEmpty("vaRateBar", "売上データなし（Time候補を変更して試してください）");
+      } else {
+        const bySalesShare = rowsWithSales.slice().sort((a, b) => b.salesShare - a.salesShare);
+        Plotly.newPlot("salesBar", [{
+          type: "bar",
+          orientation: "h",
+          y: bySalesShare.map(r => r.industry),
+          x: bySalesShare.map(r => r.salesShare),
+          customdata: bySalesShare.map(r => r.sales),
+          hovertemplate: "<b>%{y}</b><br>売上シェア=%{x:.2%}<br>売上値=%{customdata:,}<extra></extra>",
+          textfont: { color: '#f8fafc' }
+        }], {
+          margin: { l: 140, r: 10, t: 10, b: 20 },
+          xaxis: { tickformat: ".0%" },
+          yaxis: { autorange: "reversed", automargin: true },
+          paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+          font: { color: "#f8fafc", family: "'Noto Sans JP', sans-serif" }
+        }, { displayModeBar: false });
+
+        const byVaRate = rowsWithSales
+          .filter(r => r.vaRate !== null && isFinite(r.vaRate))
+          .slice()
+          .sort((a, b) => b.vaRate - a.vaRate);
+
+        Plotly.newPlot("vaRateBar", [{
+          type: "bar",
+          orientation: "h",
+          y: byVaRate.map(r => r.industry),
+          x: byVaRate.map(r => r.vaRate),
+          customdata: byVaRate.map(r => [r.gdp, r.sales]),
+          hovertemplate: "<b>%{y}</b><br>付加価値率(GDP/売上)=%{x:.2%}<br>GDP=%{customdata[0]:,}<br>売上=%{customdata[1]:,}<extra></extra>",
+          textfont: { color: '#f8fafc' }
+        }], {
+          margin: { l: 140, r: 10, t: 10, b: 20 },
+          xaxis: { tickformat: ".0%" },
+          yaxis: { autorange: "reversed", automargin: true },
+          paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+          font: { color: "#f8fafc", family: "'Noto Sans JP', sans-serif" }
+        }, { displayModeBar: false });
+      }
+
+      // Scatter
+      const pts = rows.slice().sort((a, b) => b.diff - a.diff);
+
+      let x, y, xTitle, yTitle, caption;
+      /*
+      if (axisMode === "emp_x_gdp_y") {
+        x = pts.map(p => p.empShare);
+        y = pts.map(p => p.gdpShare);
+        xTitle = "雇用シェア";
+        yTitle = "GDPシェア";
+        caption = "横：雇用シェア / 縦：GDPシェア（45度線より上＝高付加価値型）";
+      } else {
+        x = pts.map(p => p.gdpShare);
+        y = pts.map(p => p.empShare);
+        xTitle = "GDPシェア";
+        yTitle = "雇用シェア";
+        caption = "横：GDPシェア / 縦：雇用シェア（45度線より下＝高付加価値型）";
+      }
+      */
+      x = pts.map(p => p.empShare);
+      y = pts.map(p => p.gdpShare);
+      xTitle = "雇用シェア";
+      yTitle = "GDPシェア";
+      caption = "横：雇用シェア / 縦：GDPシェア（45度線より上＝高付加価値型）";
+      document.getElementById("scatterCaption").textContent = caption;
+
+      const maxAxis = Math.max(...x, ...y, 0.001);
+      const sizes = pts.map(p => (p.salesShare !== null) ? (10 + 50 * p.salesShare) : 10);
+
+      Plotly.newPlot("scatter", [{
+        type: "scatter",
+        mode: "markers",
+        x, y,
+        text: pts.map(p => p.industry),
+        textposition: "top center",
+        customdata: pts.map(p => [
+          p.diff,
+          p.gdpShare, p.empShare,
+          p.salesShare,
+          p.vaRate,
+          p.laborProductivity
+        ]),
+        hovertemplate:
+          "<b>%{text}</b><br>" +
+          `${xTitle}=%{x:.2%}<br>` +
+          `${yTitle}=%{y:.2%}<br>` +
+          "稼ぐ力差(GDP−雇用)=%{customdata[0]:.2%}<br>" +
+          "売上シェア=%{customdata[3]:.2%}<br>" +
+          "付加価値率(GDP/売上)=%{customdata[4]:.2%}<br>" +
+          "労働生産性=%{customdata[5]:,.2f} 百万円/人<extra></extra>",
+        marker: { size: sizes, opacity: 0.9, line: { width: 1, color: '#f8fafc' } },
+        textfont: { color: '#f8fafc', family: "'Noto Sans JP', sans-serif" }
+      }, {
+        type: "scatter",
+        mode: "lines",
+        x: [0, maxAxis],
+        y: [0, maxAxis],
+        hoverinfo: "skip",
+        line: { dash: "dot" }
+      }], {
+        margin: { l: 60, r: 10, t: 10, b: 55 },
+        xaxis: { title: xTitle, tickformat: ".0%" },
+        yaxis: { title: yTitle, tickformat: ".0%" },
+        paper_bgcolor: "rgba(0,0,0,0)", plot_bgcolor: "rgba(0,0,0,0)",
+        font: { color: "#f8fafc", family: "'Noto Sans JP', sans-serif" },
+        dragmode: "pan"
+      }, { displayModeBar: true, scrollZoom: true });
+
+      // Ranking & CSV
+      const sorted = pts.slice().sort((a, b) => b.diff - a.diff);
+
+      lastRows = sorted.map((r, i) => ({
+        rank: i + 1,
+        industry: r.industry,
+        gdp: r.gdp,
+        emp: r.emp,
+        sales: r.sales,
+        gdp_share: r.gdpShare,
+        emp_share: r.empShare,
+        sales_share: r.salesShare,
+        diff: r.diff,
+        va_rate: r.vaRate,
+        sales_per_emp: r.salesPerEmp, // keep for csv compat or remove
+        labor_productivity: r.laborProductivity
+      }));
+
+      renderTable(lastRows);
+
+      // --- Comparison Logic ---
+      const natRows = await fetchNationalData();
+      if (natRows) {
+        lastCompRows = rows.map(r => {
+          const nat = natRows.find(n => n.industry === r.industry);
+          if (!nat) return null;
+
+          const lq = (nat.gdpShare > 0) ? (r.gdpShare / nat.gdpShare) : null;
+          const prodGap = (r.laborProductivity !== null && nat.laborProductivity !== null)
+            ? (r.laborProductivity - nat.laborProductivity) : null;
+          const shareGap = (nat.gdpShare !== null) ? (r.gdpShare - nat.gdpShare) : null;
+
+          return {
+            industry: r.industry,
+            lq: lq,
+            prod_gap: prodGap,
+            share_gap: shareGap,
+            nat_prod: nat.laborProductivity,
+            pref_prod: r.laborProductivity
+          };
+        }).filter(r => r !== null);
+
+        renderCompTable(lastCompRows);
+      }
+
+      log("完了：表示を更新しました。");
+    }
+
+    let compSortState = { key: 'lq', order: 'desc' };
+    function sortComp(key) {
+      if (compSortState.key === key) {
+        compSortState.order = (compSortState.order === 'asc' ? 'desc' : 'asc');
+      } else {
+        compSortState.key = key;
+        compSortState.order = 'desc';
+      }
+      const sorted = [...lastCompRows].sort((a, b) => {
+        const va = a[key] ?? -Infinity;
+        const vb = b[key] ?? -Infinity;
+        if (compSortState.order === 'asc') return (va > vb) ? 1 : (va < vb) ? -1 : 0;
+        return (va < vb) ? 1 : (va > vb) ? -1 : 0;
+      });
+      renderCompTable(sorted);
+    }
+
+    function renderCompTable(rows) {
+      const tb = document.getElementById("compBody");
+      if (!tb) return;
+      tb.innerHTML = "";
+      rows.forEach(r => {
+        const lqStr = (r.lq !== null) ? r.lq.toFixed(2) : "-";
+        const pgStr = (r.prod_gap !== null) ? fmtFloat.format(r.prod_gap) : "-";
+        const sgStr = (r.share_gap !== null) ? (r.share_gap * 100).toFixed(2) + "pt" : "-";
+        const natStr = (r.nat_prod !== null) ? fmtFloat.format(r.nat_prod) : "-";
+
+        // Highlight special rows
+        const style = (r.lq >= 1.2) ? "background:rgba(59, 130, 246, 0.1);" : "";
+
+        const tr = document.createElement("tr");
+        tr.style = style;
+        tr.innerHTML = `
+             <td>${escapeHtml(r.industry)}</td>
+             <td><span style="${r.lq >= 1.2 ? 'color:#60a5fa;font-weight:bold' : ''}">${lqStr}</span></td>
+             <td style="${r.prod_gap > 0 ? 'color:#4ade80' : ''}">${pgStr}</td>
+             <td style="${r.share_gap > 0 ? 'color:#4ade80' : ''}">${sgStr}</td>
+             <td style="color:var(--muted)">${natStr}</td>
+            `;
+        tb.appendChild(tr);
+      });
+    }
+
+    let sortState = { key: 'diff', order: 'desc' };
+    function sortRows(key) {
+      if (sortState.key === key) {
+        sortState.order = (sortState.order === 'asc' ? 'desc' : 'asc');
+      } else {
+        sortState.key = key;
+        sortState.order = 'desc';
+      }
+      const sorted = [...lastRows].sort((a, b) => {
+        const va = a[key] ?? -Infinity;
+        const vb = b[key] ?? -Infinity;
+        if (sortState.order === 'asc') return (va > vb) ? 1 : (va < vb) ? -1 : 0;
+        return (va < vb) ? 1 : (va > vb) ? -1 : 0;
+      });
+      renderTable(sorted);
+    }
+
+    function renderTable(rows) {
+      const tb = document.getElementById("rankBody");
+      if (!tb) return;
+      tb.innerHTML = "";
+      rows.forEach((p, i) => {
+        const salesPct = (p.sales_share === null) ? "-" : `${(p.sales_share * 100).toFixed(2)}%`;
+        const vaPct = (p.va_rate === null || !isFinite(p.va_rate)) ? "-" : `${(p.va_rate * 100).toFixed(2)}%`;
+        const lp = (p.labor_productivity === null || !isFinite(p.labor_productivity)) ? "-" : fmtFloat.format(p.labor_productivity);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+        <td>${p.rank}</td>
+        <td>${escapeHtml(p.industry)}</td>
+        <td>${(p.diff * 100).toFixed(2)} pt</td>
+        <td>${(p.gdp_share * 100).toFixed(2)}%</td>
+        <td>${(p.emp_share * 100).toFixed(2)}%</td>
+        <td>${salesPct}</td>
+        <td>${vaPct}</td>
+        <td>${lp}</td>
+      `;
+        tb.appendChild(tr);
+      });
+    }
+
+    function downloadCSV() {
+      if (!lastRows.length) {
+        log("CSV：まだデータがありません（先に更新してください）。");
+        return;
+      }
+      const header = ["rank", "industry", "gdp", "emp", "sales", "gdp_share", "emp_share", "sales_share", "diff", "va_rate", "sales_per_emp"];
+      const lines = [header.join(",")];
+      for (const r of lastRows) {
+        lines.push([
+          r.rank,
+          `"${String(r.industry).replaceAll('"', '""')}"`,
+          r.gdp ?? "",
+          r.emp ?? "",
+          r.sales ?? "",
+          r.gdp_share ?? "",
+          r.emp_share ?? "",
+          r.sales_share ?? "",
+          r.diff ?? "",
+          r.va_rate ?? "",
+          r.labor_productivity ?? ""
+        ].join(","));
+      }
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "industry_power_latest_with_sales.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    // =========================
+    // init
+    // =========================
+    (async function init() {
+      log("初期化中…（都道府県一覧を取得）");
+
+      let prefs;
+      try {
+        prefs = await loadPrefectures();
+      } catch (e) {
+        log("初期化エラー：" + e.message);
+        return;
+      }
+
+      const sel = document.getElementById("prefSelect");
+      sel.innerHTML = prefs.map(p => `<option value="${p.code}">${p.name}</option>`).join("");
+
+      const wakayama = prefs.find(p => p.code === "30000");
+      const tokyo = prefs.find(p => p.code === "13000");
+      if (wakayama) sel.value = "30000";
+      else if (tokyo) sel.value = "13000";
+
+      /*
+      document.getElementById("runBtn").addEventListener("click", async () => {
+        try { await runDashboard(); }
+        catch (e) { log("エラー：" + e.message); }
+      });
+      */
+
+      // Auto-run on change
+      sel.addEventListener("change", async () => {
+        try { await runDashboard(); }
+        catch (e) { log("エラー：" + e.message); }
+      });
+
+      /*
+      document.getElementById("axisMode").addEventListener("change", async () => {
+        try { await runDashboard(); }
+        catch (e) { log("エラー：" + e.message); }
+      });
+
+      document.getElementById("latestMode").addEventListener("change", async () => {
+        try { await runDashboard(); }
+        catch (e) { log("エラー：" + e.message); }
+      });
+      */
+
+      document.getElementById("dlBtn").addEventListener("click", downloadCSV);
+
+      log("準備OK。都道府県を選んで「更新」を押してください。");
+      try { await runDashboard(); } catch (e) { log("初回実行エラー：" + e.message); }
+    })();
+  </script>
+
+  <footer style="padding:0 14px 18px;color:#9bb0cf;font-size:12px;">
+    「このサービスは、統計ダッシュボードのAPI機能を使用していますが、サービスの内容は国によって保証されたものではありません。」
+  </footer>
+</body>
+
+</html>
