@@ -250,6 +250,116 @@
     ::-webkit-scrollbar-thumb:hover {
       background: #475569;
     }
+
+    /* Site Info Styles */
+    .site-info {
+      margin-top: 60px;
+      padding-top: 40px;
+      border-top: 1px solid var(--line);
+    }
+    .site-info-header {
+      margin-bottom: 32px;
+    }
+    .site-info-header h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 12px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+    .info-card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+    .info-card h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 16px;
+      color: var(--btn);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 8px;
+    }
+    .info-card p, .info-card li {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.7;
+    }
+    .info-card ul {
+      margin: 8px 0 0;
+      padding-left: 20px;
+    }
+    .info-card li {
+      margin-bottom: 8px;
+      color: var(--muted);
+    }
+    .info-card strong {
+      color: var(--text);
+    }
+    .data-def {
+      background: rgba(30, 41, 59, 0.4);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+    .data-def h3 {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    .data-sections {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+    .data-section h4 {
+      font-size: 15px;
+      color: var(--muted);
+      margin: 0 0 12px;
+      border-left: 3px solid var(--btn);
+      padding-left: 10px;
+    }
+    .note-box {
+      border-left: 4px solid #eab308;
+      background: rgba(234, 179, 8, 0.05);
+      padding: 16px 20px;
+      margin: 24px 0;
+      border-radius: 0 8px 8px 0;
+      font-size: 14px;
+    }
+    .note-box strong {
+      color: #facc15;
+    }
+    .example-section {
+      background: rgba(59, 130, 246, 0.05);
+      border: 1px dashed var(--btn);
+      border-radius: 12px;
+      padding: 24px;
+      margin-top: 24px;
+    }
+    .example-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      background: var(--btn);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      border-radius: 4px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
@@ -389,6 +499,103 @@
           シェア差 = 県GDPシェア − 全国GDPシェア（プラスなら全国平均より集積している）。
         </div>
       </div>
+
+      <!-- SITE PURPOSE / ABOUT SECTION -->
+      <section class="site-info">
+        <div class="site-info-header">
+          <h2>都道府県×産業：規模（純付加価値）と稼ぐ力（シェア差）＋売上（民営）</h2>
+        </div>
+
+        <div class="info-grid">
+          <div class="info-card">
+            <h3>1. 課題（Why）</h3>
+            <p>産業政策や投資判断では「どの産業を重点にするか」が重要ですが、現場では 規模が大きい産業、雇用を支える産業、少人数でも高い付加価値を稼ぐ産業が混同されがちです。</p>
+            <p>本ダッシュボードは、都道府県×産業の構造を <strong>規模・稼ぐ力・稼ぎ方の質の3点</strong>で整理し、重点産業候補の一次選定（スクリーニング）と、追加調査の論点設計を短時間で行うことを目的としています。</p>
+          </div>
+
+          <div class="info-card">
+            <h3>2. 意思決定（So what）</h3>
+            <p>本ツールは、主に以下の意思決定を支援します。</p>
+            <ul>
+              <li><strong>自治体・地域政策担当：</strong>重点支援産業の一次選定、産業振興の優先順位付け</li>
+              <li><strong>企業・金融の企画部門：</strong>進出・投資・提携の候補産業の絞り込み、仮説立案</li>
+              <li><strong>調査・コンサル担当：</strong>初期診断（現状把握）を短時間で行い、追加調査の論点を作る</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="info-card" style="margin-bottom: 24px;">
+          <h3>3. 論点と仮説（What）</h3>
+          <p>本ダッシュボードは、次の論点で産業を見立てます。</p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin-top: 10px;">
+            <div>
+              <li><strong>論点A：規模…</strong> 県の経済を“量”で支える産業はどれか（純付加価値シェア／売上シェア）</li>
+              <li><strong>論点B：稼ぐ力…</strong> “高付加価値型”の産業はどれか（純付加価値シェア − 雇用シェア）</li>
+              <li><strong>論点C：稼ぎ方の質…</strong> 高付加価値は「高粗利」由来か（付加価値率＝純付加価値÷売上）</li>
+            </div>
+            <div>
+              <li><strong>論点D：生産性…</strong> 人あたりでどれだけ付加価値を生むか（労働生産性＝純付加価値÷従業者）</li>
+              <li><strong>論点E：全国平均との差…</strong> 集積があるか（特化係数LQ）／生産性が高いか（生産性格差）</li>
+            </div>
+          </div>
+        </div>
+
+        <div class="data-def">
+          <h3>4. データと定義（Evidence）</h3>
+          <div class="data-sections">
+            <div class="data-section">
+              <h4>取得経路と原典</h4>
+              <p>統計ダッシュボードAPI（e-Stat）から、民営の産業別系列を取得して描画しています。</p>
+              <ul>
+                <li><strong>純付加価値額（民営）：</strong>経済センサス</li>
+                <li><strong>従業者数（民営）：</strong>社会・人口統計体系（SSDS）</li>
+                <li><strong>売上金額（民営）：</strong>社会・人口統計体系（SSDS）</li>
+              </ul>
+            </div>
+            <div class="data-section">
+              <h4>定義と単位</h4>
+              <ul>
+                <li><strong>稼ぐ力差（pt）：</strong>（純付加価値シェア − 雇用シェア）×100</li>
+                <li><strong>付加価値率（％）：</strong>（純付加価値 ÷ 売上）×100</li>
+                <li><strong>労働生産性：</strong>純付加価値 ÷ 従業者（百万円/人）</li>
+                <li><strong>特化係数（LQ）：</strong>県純付加価値シェア ÷ 全国純付加価値シェア</li>
+              </ul>
+              <p style="font-size: 12px; color: var(--muted); margin-top: 8px;">※金額＝百万円、人数＝人。最新年（Time=99999999）を自動採用します。</p>
+            </div>
+          </div>
+
+          <div class="note-box">
+            <strong>注意（重要）：</strong>
+            本ツールは統計ダッシュボードAPI上の系列を組み合わせた <strong>参考指標（スクリーニング）</strong>です。指標間で原典や年次が一致しない場合があります。付加価値率・労働生産性は同一画面内の相対比較を主用途とし、厳密な比較が必要な場合は原典統計での確認を推奨します。
+          </div>
+        </div>
+
+        <div class="example-section">
+          <div class="example-tag">例：和歌山県</div>
+          <h3>5. 結果（Findings：発見トップ3）</h3>
+          <p>和歌山県の稼ぐ力差上位は、製造業（+7.73pt）、金融業・保険業（+2.63pt）、建設業（+2.54pt）。特に製造業は <strong>GDPシェア23.79%に対して雇用シェア16.06%</strong>と差が大きく、県内で相対的に高付加価値型の位置づけになっている。</p>
+          <p>全国平均との差（集積）として、漁業（LQ=3.10）、複合サービス事業（LQ=2.35）、<strong>電気・ガス・熱供給・水道業（LQ=1.62）</strong>などに相対的な集積が見られ、生産性格差がプラスの産業として <strong>電気・ガス・熱供給・水道業（+2.20百万円/人）</strong>が確認できる。</p>
+        </div>
+
+        <div class="info-grid" style="margin-top: 24px;">
+          <div class="info-card">
+            <h3>6. 示唆（Implications）</h3>
+            <ul>
+              <li><strong>優先度A：重点候補の一次選定</strong><br>稼ぐ力差（pt）ランキング上位から候補を抽出し、売上シェアと付加価値率／労働生産性を合わせて“質”を確認します。</li>
+              <li><strong>優先度B：伸ばし方の議論</strong><br>候補産業について、人材・設備投資・研究開発・販路・規制/制度などのボトルネック仮説を立て、追加調査へ進みます。</li>
+            </ul>
+          </div>
+          <div class="info-card">
+            <h3>7. 再現性（How）</h3>
+            <p>本ページはブラウザ上で統計ダッシュボードAPI（e-Stat）からリアルタイムに取得して描画しています。</p>
+            <ul>
+              <li><strong>都道府県一覧：</strong>getRegionInfo（RegionLevel=3）</li>
+              <li><strong>各指標：</strong>JsonStat/getData（最新を自動取得）</li>
+              <li><strong>全国比較：</strong>全国（RegionCode=00000）を取得し、LQ等を算出</li>
+            </ul>
+          </div>
+        </div>
+      </section>
     </section>
   </main>
 
